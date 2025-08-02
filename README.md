@@ -50,7 +50,7 @@ Access the website at https://pom-pom-pom.vercel.app/
 
 For Software:
 
-# Screenshots (Add at least 3)
+# Screenshots
 
 ![Home](screenshots/home.jpg)
 Initial Home screen where players learn how the game controls work.
