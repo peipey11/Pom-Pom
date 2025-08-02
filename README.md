@@ -9,7 +9,7 @@
 ### Team Members
 
 - Team Lead: [Vishnu P P] - [AISAT]
-- Member 2: [Joel Prince] - [AISAT]
+- Member 2: [Joel prince] - [AISAT]
 
 ### Project Description
 
@@ -101,7 +101,7 @@ _Explain what the video demonstrates_
 ## Team Contributions
 
 - [Vishnu P P]: [Gameplay and backend]
-- [Joel prince]: [Frontend]
+- [Joel prince]: [Front end]
 
 ---
 
