@@ -6,27 +6,43 @@ const retryBtn = document.getElementById("retry");
 const videoElement = document.getElementById("video");
 
 const tileSequence = [];
-const colors = ["red", "green", "blue"];
-let currentIndex = 0;
+const colors = ["red", "green"];
+let currentRow = 0;
+let currentTileIndex = 0;
 let score = 0;
 let timer = 25;
 let timerInterval;
+let gameOver = false;
 
 // === TILE SETUP ===
-for (let i = 0; i < 25; i++) {
-  const tile = document.createElement("div");
-  const color = colors[Math.floor(Math.random() * colors.length)];
-  tile.classList.add("tile", color);
-  grid.appendChild(tile);
-  tileSequence.push({ color, element: tile });
+function createRow() {
+  const newRow = [];
+  for (let i = 0; i < 5; i++) {
+    const tile = document.createElement("div");
+    const color = colors[Math.floor(Math.random() * colors.length)];
+    tile.classList.add("tile", color);
+    grid.appendChild(tile);
+    newRow.push({ color, element: tile });
+  }
+  return newRow;
 }
-tileSequence[0].element.classList.add("highlight");
+
+function highlightCurrentTile() {
+  tileSequence[currentRow][currentTileIndex].element.classList.add("highlight");
+}
+
+for (let r = 0; r < 5; r++) {
+  tileSequence.push(createRow());
+}
+highlightCurrentTile();
 
 // === FRAME BUFFER FOR SMOOTH DETECTION ===
 let lastStates = [];
+const BUFFER_SIZE = 5;
 
-const BUFFER_SIZE = 5; // Increased from 3 → 5
 let readyForNext = true;
+let gestureCooldown = false;
+let handsPreviouslyOpen = false;
 
 // === HEURISTIC: IS HAND OPEN ===
 function isHandOpen(landmarks) {
@@ -47,42 +63,47 @@ function isHandOpen(landmarks) {
   return openFingers >= 3 && isThumbOpen;
 }
 
-// === VALIDATE GESTURE AGAINST TILE ===
+// === VALIDATE GESTURE ===
 function validateGesture(gesture) {
-  const currentTile = tileSequence[currentIndex];
-  if (!currentTile || gesture === null || !readyForNext) return;
+  if (!readyForNext || gameOver) return;
 
-  const expectedColor = currentTile.color;
-  const gestureMap = {
-    right: "red",
-    left: "green",
-    both: "blue",
-  };
+  const tile = tileSequence[currentRow][currentTileIndex];
+  const expected = tile.color;
+  const gestureMap = { right: "red", left: "green" };
+  const expectedGesture = Object.keys(gestureMap).find(
+    (key) => gestureMap[key] === expected
+  );
 
-  if (gestureMap[gesture] === expectedColor) {
-    currentTile.element.classList.remove("highlight");
+  if (gesture === expectedGesture && !gestureCooldown) {
+    tile.element.classList.remove("highlight");
     score++;
     scoreEl.textContent = `Score: ${score}`;
-    currentIndex++;
+    currentTileIndex++;
     readyForNext = false;
+    gestureCooldown = true;
 
-    if (currentIndex >= tileSequence.length) {
-      endGame(true);
-    } else {
-      tileSequence[currentIndex].element.classList.add("highlight");
+    if (currentTileIndex >= 5) {
+      // Row complete
+      for (let t of tileSequence[currentRow]) grid.removeChild(t.element);
+      tileSequence[currentRow] = null;
+      tileSequence.push(createRow());
+      currentRow++;
+      currentTileIndex = 0;
     }
-  } else {
+
+    highlightCurrentTile();
+  } else if (gesture !== expectedGesture && !gestureCooldown) {
     endGame(false);
   }
 }
 
 function endGame(won) {
   clearInterval(timerInterval);
+  gameOver = true;
   gameOverEl.textContent = won
     ? "🎉 You Win!"
     : `❌ Game Over! Final Score: ${score}`;
   retryBtn.style.display = "inline-block";
-  gameOver = true;
 }
 
 // === TIMER ===
@@ -90,14 +111,11 @@ function startTimer() {
   timerInterval = setInterval(() => {
     timer--;
     timerEl.textContent = `⏱️ ${timer}`;
-    if (timer <= 0) endGame(false);
+    if (timer <= 0) endGame(true);
   }, 1000);
 }
 
-// === HAND DETECTION SETUP ===
-
-let gameOver = false;
-
+// === HAND DETECTION ===
 const hands = new Hands({
   locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
 });
@@ -122,21 +140,11 @@ hands.onResults((results) => {
     }
   });
 
-  // Frame buffering
   lastStates.push(openHandLabels);
   if (lastStates.length > BUFFER_SIZE) lastStates.shift();
 
-  const consistentBoth = lastStates.every(
-    (state) => state.includes("Left") && state.includes("Right")
-  );
-
   let gesture = null;
-  if (consistentBoth) {
-    gesture = "both";
-  } else if (
-    openHandLabels.includes("Left") &&
-    !openHandLabels.includes("Right")
-  ) {
+  if (openHandLabels.includes("Left") && !openHandLabels.includes("Right")) {
     gesture = "left";
   } else if (
     openHandLabels.includes("Right") &&
@@ -145,15 +153,19 @@ hands.onResults((results) => {
     gesture = "right";
   }
 
-  if (gesture) {
-    validateGesture(gesture);
-  } else {
-    // No gesture detected → allow next
+  const handsAreOpen = openHandLabels.length > 0;
+  if (!handsAreOpen && handsPreviouslyOpen) {
     readyForNext = true;
+    gestureCooldown = false;
+  }
+  handsPreviouslyOpen = handsAreOpen;
+
+  if (gesture && readyForNext) {
+    validateGesture(gesture);
   }
 });
 
-// === START CAMERA ===
+// === CAMERA START ===
 const camera = new Camera(videoElement, {
   onFrame: async () => {
     await hands.send({ image: videoElement });
@@ -168,5 +180,5 @@ startTimer();
 
 // === RETRY ===
 retryBtn.addEventListener("click", () => {
-  window.location.href = "game.html"; // Reload cleanly
+  window.location.href = "game.html";
 });

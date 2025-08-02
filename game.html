@@ -21,7 +21,7 @@
       #grid {
         display: grid;
         grid-template-columns: repeat(5, 80px);
-        grid-template-rows: repeat(5, 80px);
+
         gap: 5px;
         margin: 20px auto;
         width: fit-content;
@@ -39,9 +39,6 @@
       }
       .green {
         background: green;
-      }
-      .blue {
-        background: blue;
       }
 
       .highlight {
@@ -64,9 +61,8 @@
   </head>
   <body>
     <h1>🖐️ Hand Tile Game</h1>
-    <div id="prompt">
-      🟥 Right Palm = Red, 🟩 Left Palm = Green, 🟦 Both Palms = Blue
-    </div>
+
+    <div id="prompt">🟥 Right Palm = Red, 🟩 Left Palm = Green</div>
     <div id="grid"></div>
     <div id="timer">⏱️ 25</div>
     <div id="score">Score: 0</div>
@@ -82,11 +78,9 @@
       style="display: none"
     ></video>
 
-    <!-- MediaPipe Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
 
-    <!-- Game Logic -->
     <script src="game.js"></script>
   </body>
 </html>
