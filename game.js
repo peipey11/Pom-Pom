@@ -14,7 +14,6 @@ let timer = 25;
 let timerInterval;
 let gameOver = false;
 
-// === TILE SETUP ===
 function createRow() {
   const newRow = [];
   for (let i = 0; i < 5; i++) {
@@ -36,7 +35,6 @@ for (let r = 0; r < 5; r++) {
 }
 highlightCurrentTile();
 
-// === FRAME BUFFER FOR SMOOTH DETECTION ===
 let lastStates = [];
 const BUFFER_SIZE = 5;
 
@@ -45,7 +43,6 @@ let gestureCooldown = false;
 let handsPreviouslyOpen = false;
 let lastGesture = null;
 
-// === HEURISTIC: IS HAND OPEN ===
 function isHandOpen(landmarks) {
   const tips = [8, 12, 16, 20];
   const pips = [6, 10, 14, 18];
@@ -64,7 +61,6 @@ function isHandOpen(landmarks) {
   return openFingers >= 3 && isThumbOpen;
 }
 
-// === VALIDATE GESTURE ===
 function validateGesture(gesture) {
   if (!readyForNext || gameOver) return;
 
@@ -75,7 +71,6 @@ function validateGesture(gesture) {
     (key) => gestureMap[key] === expected
   );
 
-  // Prevent accepting same gesture multiple times in a row without hand reset
   if (gesture === lastGesture) return;
 
   if (gesture === expectedGesture && !gestureCooldown) {
@@ -88,7 +83,6 @@ function validateGesture(gesture) {
     lastGesture = gesture;
 
     if (currentTileIndex >= 5) {
-      // Row complete
       for (let t of tileSequence[currentRow]) grid.removeChild(t.element);
       tileSequence[currentRow] = null;
       tileSequence.push(createRow());
@@ -102,6 +96,7 @@ function validateGesture(gesture) {
   }
 }
 
+// ✅ FINAL Fixed endGame logic
 function endGame(won) {
   clearInterval(timerInterval);
   gameOver = true;
@@ -109,9 +104,39 @@ function endGame(won) {
     ? "🎉 You Win!"
     : `❌ Game Over! Final Score: ${score}`;
   retryBtn.style.display = "inline-block";
+
+  const user = firebase.auth().currentUser;
+  if (!user) return;
+
+  const userRef = firebase.firestore().collection("users").doc(user.uid);
+  const scoreRef = firebase.firestore().collection("scores").doc(user.uid);
+
+  userRef.get().then((doc) => {
+    if (!doc.exists) return;
+
+    const username = doc.data().username || "unknown";
+    const currentHigh = doc.data().highscore || 0;
+
+    if (score > currentHigh) {
+      userRef.update({ highscore: score });
+    }
+
+    scoreRef.get().then((scoreDoc) => {
+      const existingHigh = scoreDoc.exists ? scoreDoc.data().highscore || 0 : 0;
+
+      if (score > existingHigh) {
+        scoreRef.set(
+          {
+            username: username,
+            highscore: score,
+          },
+          { merge: true }
+        );
+      }
+    });
+  });
 }
 
-// === TIMER ===
 function startTimer() {
   timerInterval = setInterval(() => {
     timer--;
@@ -120,7 +145,6 @@ function startTimer() {
   }, 1000);
 }
 
-// === HAND DETECTION ===
 const hands = new Hands({
   locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`,
 });
@@ -162,7 +186,7 @@ hands.onResults((results) => {
   if (!handsAreOpen && handsPreviouslyOpen) {
     readyForNext = true;
     gestureCooldown = false;
-    lastGesture = null; // Reset so same gesture can be reused after hand close
+    lastGesture = null;
   }
   handsPreviouslyOpen = handsAreOpen;
 
@@ -171,7 +195,6 @@ hands.onResults((results) => {
   }
 });
 
-// === CAMERA START ===
 const camera = new Camera(videoElement, {
   onFrame: async () => {
     await hands.send({ image: videoElement });
@@ -181,10 +204,8 @@ const camera = new Camera(videoElement, {
 });
 camera.start();
 
-// === START TIMER ===
 startTimer();
 
-// === RETRY ===
 retryBtn.addEventListener("click", () => {
   window.location.href = "game.html";
 });

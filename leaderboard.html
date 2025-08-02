@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Leaderboard</title>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+    <style>
+      body {
+        font-family: sans-serif;
+        text-align: center;
+        background-color: #f2f2f2;
+      }
+      h1 {
+        margin-top: 20px;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+        max-width: 400px;
+        margin: 0 auto;
+      }
+      li {
+        background: white;
+        padding: 12px;
+        margin: 6px 0;
+        border-radius: 6px;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🏆 Leaderboard</h1>
+    <ul id="leaderboard">
+      <li>Loading...</li>
+    </ul>
+
+    <script>
+      const firebaseConfig = {
+        apiKey: "AIzaSyBs6QROectamZGvwcE8Sw9sCDnUELuuWbQ",
+        authDomain: "handbeta-f69a5.firebaseapp.com",
+        projectId: "handbeta-f69a5",
+        storageBucket: "handbeta-f69a5.appspot.com",
+        messagingSenderId: "1001813148840",
+        appId: "1:1001813148840:web:ed7be01b276e4b2c67ee9d",
+        measurementId: "G-W9340KZW2B",
+      };
+
+      firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+
+      async function loadLeaderboard() {
+        const usersRef = db.collection("users");
+        const snapshot = await usersRef
+          .orderBy("highscore", "desc")
+          .limit(10)
+          .get();
+
+        const leaderboard = document.getElementById("leaderboard");
+        leaderboard.innerHTML = "";
+
+        snapshot.forEach((doc) => {
+          const data = doc.data();
+          const item = document.createElement("li");
+          item.textContent = `${data.username || "Unknown"} - ${
+            data.highscore || 0
+          }`;
+          leaderboard.appendChild(item);
+        });
+      }
+
+      loadLeaderboard();
+    </script>
+  </body>
+</html>
