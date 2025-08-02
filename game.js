@@ -15,7 +15,7 @@ let timerInterval;
 // === TILE SETUP ===
 for (let i = 0; i < 25; i++) {
   const tile = document.createElement("div");
-  const color = colors[i % 3]; // repeat R, G, B
+  const color = colors[Math.floor(Math.random() * colors.length)];
   tile.classList.add("tile", color);
   grid.appendChild(tile);
   tileSequence.push({ color, element: tile });
@@ -24,18 +24,18 @@ tileSequence[0].element.classList.add("highlight");
 
 // === FRAME BUFFER FOR SMOOTH DETECTION ===
 let lastStates = [];
-const BUFFER_SIZE = 3;
+
+const BUFFER_SIZE = 5; // Increased from 3 → 5
+let readyForNext = true;
 
 // === HEURISTIC: IS HAND OPEN ===
 function isHandOpen(landmarks) {
-  const tips = [8, 12, 16, 20]; // fingertips
-  const pips = [6, 10, 14, 18]; // middle joints
-
+  const tips = [8, 12, 16, 20];
+  const pips = [6, 10, 14, 18];
   let openFingers = 0;
+
   for (let i = 0; i < tips.length; i++) {
-    if (landmarks[tips[i]].y < landmarks[pips[i]].y) {
-      openFingers++;
-    }
+    if (landmarks[tips[i]].y < landmarks[pips[i]].y) openFingers++;
   }
 
   const thumbTip = landmarks[4];
@@ -50,7 +50,7 @@ function isHandOpen(landmarks) {
 // === VALIDATE GESTURE AGAINST TILE ===
 function validateGesture(gesture) {
   const currentTile = tileSequence[currentIndex];
-  if (!currentTile || gesture === null) return;
+  if (!currentTile || gesture === null || !readyForNext) return;
 
   const expectedColor = currentTile.color;
   const gestureMap = {
@@ -61,9 +61,10 @@ function validateGesture(gesture) {
 
   if (gestureMap[gesture] === expectedColor) {
     currentTile.element.classList.remove("highlight");
-    currentIndex++;
     score++;
     scoreEl.textContent = `Score: ${score}`;
+    currentIndex++;
+    readyForNext = false;
 
     if (currentIndex >= tileSequence.length) {
       endGame(true);
@@ -94,7 +95,7 @@ function startTimer() {
 }
 
 // === HAND DETECTION SETUP ===
-let lastGesture = null;
+
 let gameOver = false;
 
 const hands = new Hands({
@@ -115,8 +116,7 @@ hands.onResults((results) => {
   let openHandLabels = [];
 
   results.multiHandLandmarks.forEach((landmarks, index) => {
-    const isOpen = isHandOpen(landmarks);
-    if (isOpen) {
+    if (isHandOpen(landmarks)) {
       const label = results.multiHandedness[index].label;
       openHandLabels.push(label);
     }
@@ -145,10 +145,11 @@ hands.onResults((results) => {
     gesture = "right";
   }
 
-  // Avoid repeated validation for same gesture
-  if (gesture && gesture !== lastGesture) {
-    lastGesture = gesture;
+  if (gesture) {
     validateGesture(gesture);
+  } else {
+    // No gesture detected → allow next
+    readyForNext = true;
   }
 });
 
@@ -167,5 +168,5 @@ startTimer();
 
 // === RETRY ===
 retryBtn.addEventListener("click", () => {
-  window.location.reload();
+  window.location.href = "game.html"; // Reload cleanly
 });
