@@ -47,30 +47,46 @@
         measurementId: "G-W9340KZW2B",
       };
 
+      // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
+      const auth = firebase.auth();
 
+      // 🔒 Check if user is logged in
+      auth.onAuthStateChanged((user) => {
+        if (!user) {
+          // Not logged in → redirect to login
+          window.location.href = "index.html";
+        } else {
+          // Logged in → load leaderboard
+          loadLeaderboard();
+        }
+      });
+
+      // 🏆 Load leaderboard from Firestore
       async function loadLeaderboard() {
-        const usersRef = db.collection("users");
-        const snapshot = await usersRef
-          .orderBy("highscore", "desc")
-          .limit(10)
-          .get();
+        try {
+          const usersRef = db.collection("users");
+          const snapshot = await usersRef
+            .orderBy("highscore", "desc")
+            .limit(10)
+            .get();
 
-        const leaderboard = document.getElementById("leaderboard");
-        leaderboard.innerHTML = "";
+          const leaderboard = document.getElementById("leaderboard");
+          leaderboard.innerHTML = "";
 
-        snapshot.forEach((doc) => {
-          const data = doc.data();
-          const item = document.createElement("li");
-          item.textContent = `${data.username || "Unknown"} - ${
-            data.highscore || 0
-          }`;
-          leaderboard.appendChild(item);
-        });
+          snapshot.forEach((doc) => {
+            const data = doc.data();
+            const item = document.createElement("li");
+            item.textContent = `${data.username || "Unknown"} - ${
+              data.highscore || 0
+            }`;
+            leaderboard.appendChild(item);
+          });
+        } catch (error) {
+          console.error("Error loading leaderboard:", error);
+        }
       }
-
-      loadLeaderboard();
     </script>
   </body>
 </html>

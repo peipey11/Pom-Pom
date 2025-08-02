@@ -78,12 +78,12 @@
     <h1>Pom Pom</h1>
     <button
       id="leaderboard-btn"
-      onclick="window.location.href='leaderboard.html'"
+      onclick="window.location.href='dashboard.html'"
     >
       LeaderBoards
     </button>
 
-    <div id="prompt">🟩 Left Palm = Green,🟥 Right Palm = Red</div>
+    <div id="prompt">🟩 Left Palm = Green, 🟥 Right Palm = Red</div>
     <div id="grid"></div>
     <div id="timer">⏱️ 25</div>
     <div id="score">Score: 0</div>
@@ -99,6 +99,7 @@
       style="display: none"
     ></video>
 
+    <!-- Game & MediaPipe Scripts -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
     <script src="game.js"></script>
@@ -110,5 +111,15 @@
 
     <!-- Your firebase config -->
     <script src="firebase.js"></script>
+
+    <!-- Auth check -->
+    <script>
+      firebase.auth().onAuthStateChanged((user) => {
+        if (!user) {
+          // Not logged in
+          window.location.href = "index.html";
+        }
+      });
+    </script>
   </body>
 </html>
