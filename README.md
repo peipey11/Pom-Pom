@@ -23,6 +23,10 @@ Urgent need to Pom Pom everyday
 
 Turn your hands into pom-pom cannons. No buttons. Just vibes
 
+### What is useless about the project?
+
+It solves nothing. It just lets you throw imaginary pom-poms using real hand gestures. Useless? Yes. Entertaining? Also yes.
+
 ## Technical Details
 
 ### Technologies/Components Used
