@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Palm Detection Game</title>
+    <style>
+      body {
+        background-color: #111;
+        color: white;
+        font-family: Arial, sans-serif;
+        text-align: center;
+      }
+
+      #output {
+        margin-top: 20px;
+        font-size: 24px;
+      }
+
+      #camera {
+        transform: scaleX(-1); /* Mirror camera feed */
+        width: 480px;
+        height: 360px;
+        border: 2px solid white;
+        margin-top: 10px;
+      }
+
+      .status-indicator {
+        width: 60px;
+        height: 60px;
+        border-radius: 50%;
+        margin: 20px auto;
+        background-color: gray;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>🖐 Palm Detection Game</h1>
+    <div id="output">Waiting for hand...</div>
+    <div class="status-indicator" id="indicator"></div>
+
+    <video id="camera" autoplay muted playsinline></video>
+
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
+    <script src="script.js"></script>
+  </body>
+</html>

@@ -1,0 +1,18 @@
+body {
+  font-family: sans-serif;
+  text-align: center;
+  background-color: #111;
+  color: #fff;
+}
+
+video,
+canvas {
+  border: 1px solid #444;
+  border-radius: 10px;
+  margin: 10px;
+}
+
+#blinkType {
+  font-size: 1.5em;
+  margin-top: 20px;
+}
