@@ -43,6 +43,7 @@ const BUFFER_SIZE = 5;
 let readyForNext = true;
 let gestureCooldown = false;
 let handsPreviouslyOpen = false;
+let lastGesture = null;
 
 // === HEURISTIC: IS HAND OPEN ===
 function isHandOpen(landmarks) {
@@ -74,6 +75,9 @@ function validateGesture(gesture) {
     (key) => gestureMap[key] === expected
   );
 
+  // Prevent accepting same gesture multiple times in a row without hand reset
+  if (gesture === lastGesture) return;
+
   if (gesture === expectedGesture && !gestureCooldown) {
     tile.element.classList.remove("highlight");
     score++;
@@ -81,6 +85,7 @@ function validateGesture(gesture) {
     currentTileIndex++;
     readyForNext = false;
     gestureCooldown = true;
+    lastGesture = gesture;
 
     if (currentTileIndex >= 5) {
       // Row complete
@@ -157,6 +162,7 @@ hands.onResults((results) => {
   if (!handsAreOpen && handsPreviouslyOpen) {
     readyForNext = true;
     gestureCooldown = false;
+    lastGesture = null; // Reset so same gesture can be reused after hand close
   }
   handsPreviouslyOpen = handsAreOpen;
 
