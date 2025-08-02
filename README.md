@@ -1,6 +1,6 @@
 <img width="3188" height="1202" alt="frame (3)" src="https://github.com/user-attachments/assets/517ad8e9-ad22-457d-9538-a9e62d137cd7" />
 
-# [Pom Pom] 🎯
+# Pom Pom 🎯
 
 ## Basic Details
 
@@ -34,21 +34,9 @@ For Software:
     Libraries:Firebase SDK, MediaPipe Hands, Google Fonts
     Hosting: Vercel
 
-### Implementation
-
-For Software:
-
-# Installation
-
-Access the website at https://pom-pom-pom.vercel.app/
-
 # Run
 
-[commands]
-
-### Project Documentation
-
-For Software:
+Access the website at https://pom-pom-pom.vercel.app/
 
 # Screenshots
 
@@ -60,43 +48,6 @@ Game screen where the fun stuff happens.
 
 ![Leaderboard](screenshots/leaderboard.jpg)
 Leaderboard to find who the POM POM god is.
-
-# Diagrams
-
-![Workflow](Add your workflow/architecture diagram here)
-_Add caption explaining your workflow_
-
-For Hardware:
-
-# Schematic & Circuit
-
-![Circuit](Add your circuit diagram here)
-_Add caption explaining connections_
-
-![Schematic](Add your schematic diagram here)
-_Add caption explaining the schematic_
-
-# Build Photos
-
-![Components](Add photo of your components here)
-_List out all components shown_
-
-![Build](Add photos of build process here)
-_Explain the build steps_
-
-![Final](Add photo of final product here)
-_Explain the final build_
-
-### Project Demo
-
-# Video
-
-[Add your demo video link here]
-_Explain what the video demonstrates_
-
-# Additional Demos
-
-[Add any extra demo materials/links]
 
 ## Team Contributions
 
