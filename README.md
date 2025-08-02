@@ -4,24 +4,24 @@
 
 ## Basic Details
 
-### Team Name: [Liars]
+### Team Name: Liars
 
 ### Team Members
 
-- Team Lead: [Vishnu P P] - [AISAT]
-- Member 2: [Joel prince] - [AISAT]
+- Team Lead: Vishnu P P - AISAT
+- Member 2: Joel prince - AISAT
 
 ### Project Description
 
-[Pom Pom is a gesture-controlled game where players use hand movements detected via webcam.]
+Pom Pom is a gesture-controlled game where players use hand movements detected via webcam.
 
 ### The Problem (that doesn't exist)
 
-[Urgent need to Pom Pom everyday]
+Urgent need to Pom Pom everyday
 
 ### The Solution (that nobody asked for)
 
-[Turn your hands into pom-pom cannons. No buttons. Just vibes]
+Turn your hands into pom-pom cannons. No buttons. Just vibes
 
 ## Technical Details
 
@@ -51,8 +51,8 @@ Leaderboard to find who the POM POM god is.
 
 ## Team Contributions
 
-- [Vishnu P P]: [Gameplay and backend]
-- [Joel prince]: [Front end]
+- Vishnu P P: Gameplay and Backend
+- Joel prince:Front end
 
 ---
 
