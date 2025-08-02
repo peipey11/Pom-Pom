@@ -2,58 +2,164 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Palm Detection Game</title>
+    <title>Warm Up</title>
     <style>
+      * {
+        box-sizing: border-box;
+      }
+
       body {
+        margin: 0;
+        padding: 0;
         background-color: #111;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
         color: white;
-        font-family: Arial, sans-serif;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+      }
+
+      header {
+        width: 100%;
+        padding: 20px 0;
+        background-color: #1a1a1a;
+        text-align: center;
+        font-size: 32px;
+        font-weight: bold;
+        border-bottom: 1px solid #333;
+      }
+
+      main {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 30px;
+        max-width: 1200px;
+        width: 100%;
+      }
+
+      .left-panel,
+      .right-panel {
+        flex: 1 1 400px;
+        padding: 20px;
+      }
+
+      .left-panel {
         text-align: center;
       }
 
       #output {
-        margin-top: 20px;
-        font-size: 24px;
+        font-size: 20px;
+        margin-bottom: 20px;
       }
 
       #camera {
-        transform: scaleX(-1); /* Mirror camera feed */
-        width: 480px;
-        height: 360px;
+        width: 100%;
+        max-width: 480px;
+        height: auto;
         border: 2px solid white;
-        margin-top: 10px;
+        border-radius: 10px;
+        transform: scaleX(-1);
+        margin-bottom: 20px;
       }
 
       .status-indicator {
         width: 60px;
         height: 60px;
         border-radius: 50%;
-        margin: 20px auto;
+        margin: 0 auto 20px;
         background-color: gray;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
       }
 
       .play-button {
-        margin: 20px auto 0;
-        padding: 12px 24px;
+        padding: 12px 28px;
         font-size: 18px;
         background-color: #28a745;
         color: white;
         border: none;
         border-radius: 8px;
         cursor: pointer;
-        display: block;
+        transition: background-color 0.3s;
       }
 
       .play-button:hover {
         background-color: #218838;
+      }
+
+      .rules-box {
+        background-color: #1e1e1e;
+        padding: 20px;
+        border-radius: 10px;
+        border: 1px solid #333;
+        margin-bottom: 20px;
+      }
+
+      .rules-box h2 {
+        margin-top: 0;
+        color: white;
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+
+      .rules-box ul {
+        list-style-type: disc;
+        padding-left: 20px;
+        line-height: 1.6;
+        font-size: 16px;
+      }
+
+      .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: #1a1a1a;
+        color: #fff;
+        font-size: 0.95rem;
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .leaderboard-table th,
+      .leaderboard-table td {
+        padding: 12px;
+        text-align: center;
+        border-bottom: 1px solid #333;
+      }
+
+      .leaderboard-table th {
+        background-color: #2e2e2e;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .leaderboard-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .highlight-user {
+        background-color: #222;
+        font-weight: bold;
+      }
+
+      @media (max-width: 768px) {
+        main {
+          flex-direction: column;
+          align-items: center;
+        }
+
+        .right-panel {
+          margin-top: 30px;
+        }
       }
     </style>
 
     <!-- Firebase SDKs -->
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
 
-    <!-- Your Firebase config -->
     <script>
       const firebaseConfig = {
         apiKey: "AIzaSyBs6QROectamZGvwcE8Sw9sCDnUELuuWbQ",
@@ -69,30 +175,144 @@
 
     <!-- Auth check -->
     <script>
+      let currentUser = null;
+
       firebase.auth().onAuthStateChanged((user) => {
         if (!user) {
           window.location.href = "index.html";
         } else {
-          console.log("Logged in as:", user.displayName || user.email);
+          currentUser = user;
+          loadLeaderboard();
         }
       });
     </script>
   </head>
 
   <body>
-    <h1>Warm Up and get Familiar</h1>
-    <div id="output">Waiting for hand...</div>
-    <div class="status-indicator" id="indicator"></div>
+    <main>
+      <div class="left-panel">
+        <div id="output">Waiting for hand...</div>
+        <div class="status-indicator" id="indicator"></div>
+        <video id="camera" autoplay muted playsinline></video>
+        <button class="play-button" id="playBtn">Play Game</button>
+      </div>
 
-    <video id="camera" autoplay muted playsinline></video>
+      <div class="right-panel">
+        <div class="rules-box">
+          <h2>Tips</h2>
+          <ul>
+            <li>Make sure your camera is positioned properly.</li>
+            <li>
+              Open <strong>left palm</strong> to activate
+              <span style="color: #00ff00">green tiles</span>.
+            </li>
+            <li>
+              Open <strong>right palm</strong> to activate
+              <span style="color: #ff4444">red tiles</span>.
+            </li>
+            <li>Open <strong>Both palms</strong> to restart the game(Retry)</li>
+            <li>Score as many points as possible within the time limit.</li>
 
-    <button class="play-button" onclick="window.location.href='game.html'">
-      Play Game
-    </button>
+            <li>Press space to start the game.</li>
+          </ul>
+        </div>
 
+        <h2 style="margin-top: 2rem; color: white">Leaderboard 🏆</h2>
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Position</th>
+              <th>Username</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard-body">
+            <tr>
+              <td colspan="3">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
+
+    <!-- Camera + Hand tracking -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
-
     <script src="script.js"></script>
+
+    <!-- Leaderboard logic -->
+    <script>
+      const db = firebase.firestore();
+
+      async function loadLeaderboard() {
+        const usersRef = db.collection("users");
+        const allSnapshot = await usersRef.orderBy("highscore", "desc").get();
+
+        const tbody = document.getElementById("leaderboard-body");
+        tbody.innerHTML = "";
+
+        if (allSnapshot.empty) {
+          const row = document.createElement("tr");
+          row.innerHTML = `<td colspan="3">No data found.</td>`;
+          tbody.appendChild(row);
+          return;
+        }
+
+        let data = [];
+        let currentUserRank = -1;
+
+        allSnapshot.forEach((doc, index) => {
+          const userData = doc.data();
+          const isCurrent = currentUser && currentUser.uid === doc.id;
+          if (isCurrent) currentUserRank = index;
+
+          data.push({
+            username: userData.username || "Anonymous",
+            score: userData.highscore || 0,
+            isCurrent,
+            position: index + 1,
+          });
+        });
+
+        const top3 = data.slice(0, 3);
+        top3.forEach((user, i) => {
+          const row = document.createElement("tr");
+          const medal = ["🥇", "🥈", "🥉"][i] || user.position;
+          row.innerHTML = `
+            <td>${medal}</td>
+            <td>${user.username}</td>
+            <td>${user.score}</td>
+          `;
+          if (user.isCurrent) row.classList.add("highlight-user");
+          tbody.appendChild(row);
+        });
+
+        if (currentUserRank >= 3) {
+          const user = data[currentUserRank];
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${user.position}</td>
+            <td>${user.username}</td>
+            <td>${user.score}</td>
+          `;
+          row.classList.add("highlight-user");
+          tbody.appendChild(row);
+        }
+      }
+    </script>
+
+    <!-- Play button + Space key trigger -->
+    <script>
+      document.getElementById("playBtn").addEventListener("click", () => {
+        window.location.href = "game.html";
+      });
+
+      document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+          e.preventDefault();
+          document.getElementById("playBtn").click();
+        }
+      });
+    </script>
   </body>
 </html>
