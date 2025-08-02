@@ -22,6 +22,7 @@
         height: 100vh;
         margin: 0;
         position: relative;
+        overflow: hidden;
       }
 
       body::before {
@@ -33,6 +34,33 @@
         bottom: 0;
         background: rgba(0, 0, 0, 0.1);
         z-index: 1;
+      }
+
+      @keyframes rotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .rotating-image {
+        width: 300px;
+        height: auto;
+        position: absolute;
+        animation: rotate 4s linear infinite;
+        z-index: 2;
+      }
+
+      .bottom-left {
+        bottom: 95px;
+        left: 155px;
+      }
+
+      .bottom-right {
+        bottom: 60px;
+        right: 100px;
       }
 
       h2 {
@@ -192,6 +220,20 @@
         .button-text {
           font-size: 13px;
         }
+
+        .rotating-image {
+          width: 60px;
+        }
+
+        .bottom-left {
+          bottom: 10px;
+          left: 10px;
+        }
+
+        .bottom-right {
+          bottom: 10px;
+          right: 10px;
+        }
       }
 
       /* High contrast mode support */
@@ -208,6 +250,9 @@
   </head>
 
   <body>
+    <img src="ring.png" class="rotating-image bottom-left" alt="Left Gear" />
+    <img src="ring.png" class="rotating-image bottom-right" alt="Right Gear" />
+
     <h2></h2>
 
     <div class="container">
