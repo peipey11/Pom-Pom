@@ -25,24 +25,67 @@ const camera = new Camera(videoElement, {
 });
 camera.start();
 
-function onResults(results) {
-  const handsDetected = results.multiHandLandmarks.length;
-  const labels = results.multiHandedness.map((h) => h.label); // "Left", "Right"
+// Frame buffer for temporal smoothing
+let lastStates = [];
+const BUFFER_SIZE = 3;
 
-  if (handsDetected === 0) {
-    updateStatus("No hands detected", "gray");
-  } else if (handsDetected === 1) {
-    const hand = labels[0];
-    if (hand === "Left") {
-      updateStatus("🟩 Left hand", "green");
-    } else if (hand === "Right") {
-      updateStatus("🟥 Right hand", "red");
+function onResults(results) {
+  let openHandLabels = [];
+
+  results.multiHandLandmarks.forEach((landmarks, index) => {
+    const isOpen = isHandOpen(landmarks);
+    if (isOpen) {
+      const label = results.multiHandedness[index].label;
+      openHandLabels.push(label);
     }
-  } else if (handsDetected === 2) {
-    updateStatus("🔵 Both hands", "blue");
+  });
+
+  // Store recent states
+  lastStates.push(openHandLabels);
+  if (lastStates.length > BUFFER_SIZE) {
+    lastStates.shift(); // Keep buffer size fixed
+  }
+
+  // Analyze buffered states
+  const consistentBothHandsOpen = lastStates.every(
+    (state) => state.includes("Left") && state.includes("Right")
+  );
+
+  if (consistentBothHandsOpen) {
+    updateStatus("🔵 Both hands open", "blue");
+  } else if (openHandLabels.length === 1) {
+    if (openHandLabels[0] === "Left") {
+      updateStatus("🟩 Open Left Hand", "green");
+    } else {
+      updateStatus("🟥 Open Right Hand", "red");
+    }
+  } else if (openHandLabels.length === 0) {
+    updateStatus("No open hand detected", "gray");
+  } else {
+    updateStatus("🟧 Mixed/Transition", "orange");
   }
 }
 
+// Heuristic to check if hand is open
+function isHandOpen(landmarks) {
+  const tips = [8, 12, 16, 20]; // Tips of Index, Middle, Ring, Pinky
+  const pips = [6, 10, 14, 18]; // Corresponding PIP joints
+
+  let openFingers = 0;
+  for (let i = 0; i < tips.length; i++) {
+    if (landmarks[tips[i]].y < landmarks[pips[i]].y) {
+      openFingers++;
+    }
+  }
+
+  const thumbTip = landmarks[4];
+  const thumbIP = landmarks[3];
+  const wrist = landmarks[0];
+  const isThumbOpen =
+    Math.abs(thumbTip.x - wrist.x) > Math.abs(thumbIP.x - wrist.x);
+
+  return openFingers >= 3 && isThumbOpen;
+}
 function updateStatus(text, color) {
   outputText.innerText = text;
   indicator.style.backgroundColor = color;
