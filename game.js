@@ -13,6 +13,7 @@ let score = 0;
 let timer = 25;
 let timerInterval;
 let gameOver = false;
+let timerStarted = false; // ✅ Added to track timer status
 
 function createRow() {
   const newRow = [];
@@ -74,6 +75,12 @@ function validateGesture(gesture) {
   if (gesture === lastGesture) return;
 
   if (gesture === expectedGesture && !gestureCooldown) {
+    // ✅ Start timer only on first correct input
+    if (!timerStarted) {
+      timerStarted = true;
+      startTimer();
+    }
+
     tile.element.classList.remove("highlight");
     score++;
     scoreEl.textContent = `Score: ${score}`;
@@ -101,7 +108,7 @@ function endGame(won) {
   clearInterval(timerInterval);
   gameOver = true;
   gameOverEl.textContent = won
-    ? "🎉 You Win!"
+    ? "Time is Up!!!"
     : `❌ Game Over! Final Score: ${score}`;
   retryBtn.style.display = "inline-block";
 
@@ -203,8 +210,6 @@ const camera = new Camera(videoElement, {
   height: 480,
 });
 camera.start();
-
-startTimer();
 
 retryBtn.addEventListener("click", () => {
   window.location.href = "game.html";
