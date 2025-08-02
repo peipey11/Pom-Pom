@@ -2,136 +2,385 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Warm Up</title>
+    <title>Warm up</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
       * {
         box-sizing: border-box;
+        margin: 0;
+        padding: 0;
       }
 
       body {
-        margin: 0;
-        padding: 0;
-        background-color: #111;
-        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #1a1a2e 0%,
+          #16213e 50%,
+          #0f3460 100%
+        );
         color: white;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
         display: flex;
         flex-direction: column;
         align-items: center;
-        min-height: 100vh;
-      }
-
-      header {
-        width: 100%;
-        padding: 20px 0;
-        background-color: #1a1a1a;
-        text-align: center;
-        font-size: 32px;
-        font-weight: bold;
-        border-bottom: 1px solid #333;
-      }
-
-      main {
-        display: flex;
-        flex-wrap: wrap;
         justify-content: center;
-        padding: 30px;
-        max-width: 1200px;
-        width: 100%;
-      }
-
-      .left-panel,
-      .right-panel {
-        flex: 1 1 400px;
         padding: 20px;
       }
 
-      .left-panel {
+      /* Animated background particles */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            circle at 20% 80%,
+            rgba(120, 119, 198, 0.3) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 255, 255, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 40% 40%,
+            rgba(120, 119, 198, 0.2) 0%,
+            transparent 50%
+          );
+        animation: float 20s ease-in-out infinite;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        33% {
+          transform: translateY(-20px) rotate(0.5deg);
+        }
+        66% {
+          transform: translateY(10px) rotate(-0.5deg);
+        }
+      }
+
+      .container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 1200px;
+        height: 100vh;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 30px;
+        align-items: center;
+        animation: fadeIn 0.8s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      /* Header */
+      h1 {
+        position: absolute;
+        top: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        font-size: clamp(1.8rem, 4vw, 2.5rem);
+        font-weight: 700;
+        margin: 0;
+        background: linear-gradient(45deg, #fff, #a8edea, #fed6e3);
+        background-size: 400% 400%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradientShift 3s ease-in-out infinite,
+          slideInDown 0.8s ease-out;
+        text-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+        z-index: 10;
+      }
+
+      @keyframes gradientShift {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      @keyframes slideInDown {
+        from {
+          opacity: 0;
+          transform: translateX(-50%) translateY(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(-50%) translateY(0);
+        }
+      }
+
+      /* Game Panel */
+      .game-panel {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 30px;
         text-align: center;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        animation: slideInLeft 0.8s ease-out 0.2s both;
+
+        /* ✨ New styles to center camera + button */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      @keyframes slideInLeft {
+        from {
+          opacity: 0;
+          transform: translateX(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .game-panel::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        animation: shimmer 3s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          left: -100%;
+        }
+        100% {
+          left: 100%;
+        }
       }
 
       #output {
-        font-size: 20px;
-        margin-bottom: 20px;
+        font-size: 1.1rem;
+        margin-bottom: 15px;
+        padding: 12px 20px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 12px;
+        font-weight: 500;
+        color: #51cf66;
+        text-shadow: 0 0 10px rgba(81, 207, 102, 0.5);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .status-container {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+        margin-bottom: 15px;
+        font-weight: 500;
+      }
+
+      .status-indicator {
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.3);
+        transition: all 0.3s ease;
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
       }
 
       #camera {
         width: 100%;
-        max-width: 480px;
-        height: auto;
-        border: 2px solid white;
-        border-radius: 10px;
+        max-width: 300px;
+        height: 225px;
+        object-fit: cover;
+        border: 2px solid rgba(255, 255, 255, 0.3);
+        border-radius: 15px;
         transform: scaleX(-1);
         margin-bottom: 20px;
-      }
-
-      .status-indicator {
-        width: 60px;
-        height: 60px;
-        border-radius: 50%;
-        margin: 0 auto 20px;
-        background-color: gray;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
       }
 
       .play-button {
-        padding: 12px 28px;
-        font-size: 18px;
-        background-color: #28a745;
+        padding: 12px 30px;
+        font-size: 1rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #667eea, #764ba2);
         color: white;
         border: none;
-        border-radius: 8px;
+        border-radius: 50px;
         cursor: pointer;
-        transition: background-color 0.3s;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        position: relative;
+        overflow: hidden;
       }
 
       .play-button:hover {
-        background-color: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #764ba2, #667eea);
       }
 
-      .rules-box {
-        background-color: #1e1e1e;
+      .play-button:active {
+        transform: translateY(-1px);
+      }
+
+      /* Info Panel */
+      .info-panel {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+        animation: slideInRight 0.8s ease-out 0.4s both;
+      }
+
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .rules-section,
+      .leaderboard-section {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
         padding: 20px;
-        border-radius: 10px;
-        border: 1px solid #333;
-        margin-bottom: 20px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
       }
 
-      .rules-box h2 {
-        margin-top: 0;
-        color: white;
-        font-size: 24px;
-        margin-bottom: 10px;
+      .rules-section::before,
+      .leaderboard-section::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.05),
+          transparent
+        );
+        animation: shimmer 4s infinite;
       }
 
-      .rules-box ul {
-        list-style-type: disc;
+      .rules-section h2,
+      .leaderboard-section h2 {
+        margin: 0 0 15px 0;
+        font-size: 1.3rem;
+        font-weight: 600;
+        background: linear-gradient(45deg, #fff, #a8edea, #fed6e3);
+        background-size: 400% 400%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradientShift 3s ease-in-out infinite;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .rules-section ul {
+        margin: 0;
         padding-left: 20px;
         line-height: 1.6;
-        font-size: 16px;
+        font-size: 0.9rem;
+      }
+
+      .rules-section li {
+        margin-bottom: 8px;
+        color: rgba(255, 255, 255, 0.9);
+      }
+
+      .rules-section strong {
+        color: #51cf66;
+        font-weight: 600;
+      }
+
+      .color-green {
+        color: #51cf66;
+        text-shadow: 0 0 10px rgba(81, 207, 102, 0.5);
+      }
+
+      .color-red {
+        color: #ff6b6b;
+        text-shadow: 0 0 10px rgba(255, 107, 107, 0.5);
       }
 
       .leaderboard-table {
         width: 100%;
         border-collapse: collapse;
-        background: #1a1a1a;
-        color: #fff;
-        font-size: 0.95rem;
+        background: rgba(255, 255, 255, 0.05);
         border-radius: 10px;
         overflow: hidden;
-      }
-
-      .leaderboard-table th,
-      .leaderboard-table td {
-        padding: 12px;
-        text-align: center;
-        border-bottom: 1px solid #333;
+        font-size: 0.85rem;
       }
 
       .leaderboard-table th {
-        background-color: #2e2e2e;
+        background: rgba(255, 255, 255, 0.1);
+        padding: 10px 8px;
+        text-align: center;
         font-weight: 600;
         text-transform: uppercase;
         letter-spacing: 0.5px;
+        font-size: 0.75rem;
+        color: #a8edea;
+      }
+
+      .leaderboard-table td {
+        padding: 8px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 0.8rem;
       }
 
       .leaderboard-table tr:last-child td {
@@ -139,18 +388,72 @@
       }
 
       .highlight-user {
-        background-color: #222;
-        font-weight: bold;
+        background: rgba(102, 126, 234, 0.2);
+        color: #667eea;
+        font-weight: 600;
+      }
+
+      .highlight-user td {
+        color: #667eea;
+        text-shadow: 0 0 10px rgba(102, 126, 234, 0.5);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 1024px) {
+        .container {
+          grid-template-columns: 1fr;
+          gap: 20px;
+          padding: 80px 20px 20px 20px;
+        }
+
+        h1 {
+          font-size: 2rem;
+        }
+
+        #camera {
+          max-width: 280px;
+          height: 210px;
+        }
       }
 
       @media (max-width: 768px) {
-        main {
-          flex-direction: column;
-          align-items: center;
+        .game-panel,
+        .info-panel {
+          padding: 20px;
         }
 
-        .right-panel {
-          margin-top: 30px;
+        #camera {
+          max-width: 250px;
+          height: 180px;
+        }
+
+        .play-button {
+          padding: 10px 25px;
+          font-size: 0.9rem;
+        }
+
+        .rules-section h2,
+        .leaderboard-section h2 {
+          font-size: 1.1rem;
+        }
+
+        h1 {
+          font-size: 1.8rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        .container {
+          padding: 70px 15px 15px 15px;
+        }
+
+        h1 {
+          font-size: 1.5rem;
+        }
+
+        #camera {
+          max-width: 220px;
+          height: 165px;
         }
       }
     </style>
@@ -189,51 +492,57 @@
   </head>
 
   <body>
-    <main>
-      <div class="left-panel">
+    <h1>Pom Pom</h1>
+
+    <div class="container">
+      <div class="game-panel">
         <div id="output">Waiting for hand...</div>
-        <div class="status-indicator" id="indicator"></div>
+        <div class="status-container">
+          <span>Status:</span>
+          <div class="status-indicator" id="indicator"></div>
+        </div>
         <video id="camera" autoplay muted playsinline></video>
-        <button class="play-button" id="playBtn">Play Game</button>
+        <button class="play-button" id="playBtn">Start Game</button>
       </div>
 
-      <div class="right-panel">
-        <div class="rules-box">
-          <h2>Tips</h2>
+      <div class="info-panel">
+        <div class="rules-section">
+          <h2>📋 Game Instructions</h2>
           <ul>
-            <li>Make sure your camera is positioned properly.</li>
+            <li>Position your camera properly for best results</li>
             <li>
               Open <strong>left palm</strong> to activate
-              <span style="color: #00ff00">green tiles</span>.
+              <span class="color-green">green tiles</span>
             </li>
             <li>
               Open <strong>right palm</strong> to activate
-              <span style="color: #ff4444">red tiles</span>.
+              <span class="color-red">red tiles</span>
             </li>
-            <li>Open <strong>Both palms</strong> to restart the game(Retry)</li>
-            <li>Score as many points as possible within the time limit.</li>
-
-            <li>Press space to start the game.</li>
+            <li>Press <strong>Space</strong> to restart the game</li>
+            <li>Score as many points as possible within time limit</li>
+            <li>Press <strong>Space</strong> to start playing</li>
           </ul>
         </div>
 
-        <h2 style="margin-top: 2rem; color: white">Leaderboard 🏆</h2>
-        <table class="leaderboard-table">
-          <thead>
-            <tr>
-              <th>Position</th>
-              <th>Username</th>
-              <th>Score</th>
-            </tr>
-          </thead>
-          <tbody id="leaderboard-body">
-            <tr>
-              <td colspan="3">Loading...</td>
-            </tr>
-          </tbody>
-        </table>
+        <div class="leaderboard-section">
+          <h2>🏆 Leaderboard</h2>
+          <table class="leaderboard-table">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Player</th>
+                <th>Score</th>
+              </tr>
+            </thead>
+            <tbody id="leaderboard-body">
+              <tr>
+                <td colspan="3">Loading...</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-    </main>
+    </div>
 
     <!-- Camera + Hand tracking -->
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>

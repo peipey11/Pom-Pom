@@ -2,75 +2,554 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <title>Hand Tile Game</title>
+    <title>Pom Pom</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
       body {
-        font-family: Arial;
+        font-family: "Inter", sans-serif;
         text-align: center;
         margin: 0;
         padding: 0;
-        background: black;
+        background: linear-gradient(
+          135deg,
+          #1a1a2e 0%,
+          #16213e 50%,
+          #0f3460 100%
+        );
         color: white;
+        height: 100vh;
+        overflow: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
       }
 
-      #prompt {
-        font-size: 1.2em;
-        margin-top: 10px;
+      /* Animated background particles */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            circle at 20% 80%,
+            rgba(120, 119, 198, 0.3) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 255, 255, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 40% 40%,
+            rgba(120, 119, 198, 0.2) 0%,
+            transparent 50%
+          );
+        animation: float 20s ease-in-out infinite;
+        pointer-events: none;
+        z-index: -1;
       }
 
-      #grid {
-        display: grid;
-        grid-template-columns: repeat(5, 80px);
-        gap: 5px;
-        margin: 20px auto;
-        width: fit-content;
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        33% {
+          transform: translateY(-20px) rotate(0.5deg);
+        }
+        66% {
+          transform: translateY(10px) rotate(-0.5deg);
+        }
       }
 
-      .tile {
-        width: 80px;
-        height: 80px;
-        box-sizing: border-box;
-        border: 2px solid black;
+      /* Header animation */
+      h1 {
+        font-size: clamp(1.8rem, 6vw, 2.5rem);
+        font-weight: 700;
+        margin: 1rem 0 0.5rem 0;
+        background: linear-gradient(45deg, #fff, #a8edea, #fed6e3);
+        background-size: 400% 400%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradientShift 3s ease-in-out infinite,
+          slideInDown 0.8s ease-out;
+        text-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+        flex-shrink: 0;
       }
 
-      .red {
-        background: red;
-      }
-      .green {
-        background: green;
-      }
-
-      .highlight {
-        border: 4px solid white;
-      }
-
-      #timer,
-      #score,
-      #game-over {
-        margin: 10px;
-        font-size: 1.5em;
+      @keyframes gradientShift {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
       }
 
-      #retry {
-        padding: 10px 20px;
-        font-size: 1em;
-        display: none;
+      @keyframes slideInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
       }
 
       #leaderboard-btn {
         position: absolute;
-        top: 10px;
-        right: 10px;
-        padding: 8px 16px;
-        background-color: #444;
+        top: 20px;
+        right: 20px;
+        padding: 12px 24px;
+        background: rgba(255, 255, 255, 0.1);
         color: white;
-        border: none;
-        border-radius: 5px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50px;
         cursor: pointer;
+        font-weight: 500;
+        font-size: 0.9rem;
+        backdrop-filter: blur(10px);
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        animation: slideInRight 0.8s ease-out 0.2s both;
+      }
+
+      @keyframes slideInRight {
+        from {
+          opacity: 0;
+          transform: translateX(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
       }
 
       #leaderboard-btn:hover {
-        background-color: #666;
+        background: rgba(255, 255, 255, 0.2);
+        border-color: rgba(255, 255, 255, 0.4);
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      #prompt {
+        font-size: clamp(0.8rem, 2.5vw, 1rem);
+        margin: 0.5rem 0 1rem 0;
+        font-weight: 400;
+        opacity: 0.9;
+        animation: fadeInUp 0.8s ease-out 0.4s both;
+        padding: 0 1rem;
+        flex-shrink: 0;
+      }
+
+      @keyframes fadeInUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 0.9;
+          transform: translateY(0);
+        }
+      }
+
+      /* Game Stats Container */
+      .stats-container {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-bottom: 1rem;
+        flex-wrap: wrap;
+        animation: fadeInUp 0.8s ease-out 0.6s both;
+        flex-shrink: 0;
+      }
+
+      .stat-card {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 0.8rem 1.2rem;
+        min-width: 100px;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+      }
+
+      .stat-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+      }
+
+      .stat-label {
+        font-size: 0.8rem;
+        opacity: 0.8;
+        margin-bottom: 0.5rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+      }
+
+      .stat-value {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #fff;
+      }
+
+      /* Grid container with glassmorphism */
+      .grid-container {
+        display: flex;
+        justify-content: center;
+        margin: 1rem 0;
+        animation: scaleIn 0.8s ease-out 0.8s both;
+        flex: 1;
+        align-items: center;
+      }
+
+      @keyframes scaleIn {
+        from {
+          opacity: 0;
+          transform: scale(0.8);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1);
+        }
+      }
+
+      #grid {
+        display: grid;
+        grid-template-columns: repeat(5, 60px);
+        gap: 6px;
+        padding: 1.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border-radius: 20px;
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+      }
+
+      .tile {
+        width: 60px;
+        height: 60px;
+        border-radius: 12px;
+        border: 3px solid transparent;
+        position: relative;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        animation: tileAppear 0.6s ease-out both;
+      }
+
+      @keyframes tileAppear {
+        from {
+          opacity: 0;
+          transform: scale(0) rotate(180deg);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) rotate(0deg);
+        }
+      }
+
+      .tile::before {
+        content: "";
+        position: absolute;
+        top: -3px;
+        left: -3px;
+        right: -3px;
+        bottom: -3px;
+        border-radius: 15px;
+        background: linear-gradient(
+          45deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: -1;
+      }
+
+      .tile:hover::before {
+        opacity: 1;
+      }
+
+      .tile:hover {
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+      }
+
+      .red {
+        background: linear-gradient(135deg, #ff6b6b, #ee5a52);
+        box-shadow: 0 5px 20px rgba(255, 107, 107, 0.4);
+      }
+
+      .green {
+        background: linear-gradient(135deg, #51cf66, #40c057);
+        box-shadow: 0 5px 20px rgba(81, 207, 102, 0.4);
+      }
+
+      .highlight {
+        border: 4px solid #fff;
+        box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3),
+          0 0 30px rgba(255, 255, 255, 0.5);
+        animation: pulse 1s ease-in-out infinite;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.05);
+        }
+      }
+
+      /* Animated score counter */
+      .score-animation {
+        animation: scoreJump 0.3s ease-out;
+      }
+
+      @keyframes scoreJump {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.2);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+
+      /* Timer warning animation */
+      .timer-warning {
+        animation: timerWarning 0.5s ease-in-out infinite;
+      }
+
+      @keyframes timerWarning {
+        0%,
+        100% {
+          color: white;
+        }
+        50% {
+          color: #ff6b6b;
+        }
+      }
+
+      /* Game over and retry container */
+      .game-end-container {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(15px);
+        border-top: 1px solid rgba(255, 255, 255, 0.2);
+        padding: 1rem;
+        text-align: center;
+        z-index: 1000;
+      }
+
+      #game-over {
+        margin: 0 auto 0.5rem auto;
+        font-size: clamp(1rem, 3vw, 1.5rem);
+        font-weight: 600;
+        max-width: 400px;
+        animation: gameOverAppear 0.5s ease-out;
+      }
+
+      @keyframes gameOverAppear {
+        from {
+          opacity: 0;
+          transform: scale(0.8) translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: scale(1) translateY(0);
+        }
+      }
+
+      #retry {
+        padding: 10px 25px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        background: linear-gradient(135deg, #667eea, #764ba2);
+        color: white;
+        border: none;
+        border-radius: 50px;
+        cursor: pointer;
+        margin: 0;
+        transition: all 0.3s ease;
+        box-shadow: 0 8px 25px rgba(102, 126, 234, 0.3);
+        animation: retryButtonAppear 0.5s ease-out 0.2s both;
+      }
+
+      @keyframes retryButtonAppear {
+        from {
+          opacity: 0;
+          transform: translateY(20px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      #retry:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 10px 25px rgba(102, 126, 234, 0.4);
+        background: linear-gradient(135deg, #764ba2, #667eea);
+      }
+
+      #retry:active {
+        transform: translateY(-1px);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        .stats-container {
+          gap: 1rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .stat-card {
+          padding: 0.8rem 1rem;
+          min-width: 100px;
+        }
+
+        #grid {
+          grid-template-columns: repeat(5, 60px);
+          gap: 6px;
+          padding: 1.5rem;
+        }
+
+        .tile {
+          width: 60px;
+          height: 60px;
+        }
+
+        #leaderboard-btn {
+          top: 15px;
+          right: 15px;
+          padding: 10px 20px;
+          font-size: 0.8rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        #grid {
+          grid-template-columns: repeat(5, 50px);
+          gap: 4px;
+          padding: 1rem;
+        }
+
+        .tile {
+          width: 50px;
+          height: 50px;
+        }
+
+        .stats-container {
+          flex-direction: column;
+          align-items: center;
+          gap: 0.5rem;
+        }
+
+        .stat-card {
+          width: 200px;
+        }
+      }
+
+      /* Stagger animation for tiles */
+      .tile:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .tile:nth-child(2) {
+        animation-delay: 0.15s;
+      }
+      .tile:nth-child(3) {
+        animation-delay: 0.2s;
+      }
+      .tile:nth-child(4) {
+        animation-delay: 0.25s;
+      }
+      .tile:nth-child(5) {
+        animation-delay: 0.3s;
+      }
+      .tile:nth-child(6) {
+        animation-delay: 0.35s;
+      }
+      .tile:nth-child(7) {
+        animation-delay: 0.4s;
+      }
+      .tile:nth-child(8) {
+        animation-delay: 0.45s;
+      }
+      .tile:nth-child(9) {
+        animation-delay: 0.5s;
+      }
+      .tile:nth-child(10) {
+        animation-delay: 0.55s;
+      }
+      .tile:nth-child(11) {
+        animation-delay: 0.6s;
+      }
+      .tile:nth-child(12) {
+        animation-delay: 0.65s;
+      }
+      .tile:nth-child(13) {
+        animation-delay: 0.7s;
+      }
+      .tile:nth-child(14) {
+        animation-delay: 0.75s;
+      }
+      .tile:nth-child(15) {
+        animation-delay: 0.8s;
+      }
+      .tile:nth-child(16) {
+        animation-delay: 0.85s;
+      }
+      .tile:nth-child(17) {
+        animation-delay: 0.9s;
+      }
+      .tile:nth-child(18) {
+        animation-delay: 0.95s;
+      }
+      .tile:nth-child(19) {
+        animation-delay: 1s;
+      }
+      .tile:nth-child(20) {
+        animation-delay: 1.05s;
+      }
+      .tile:nth-child(21) {
+        animation-delay: 1.1s;
+      }
+      .tile:nth-child(22) {
+        animation-delay: 1.15s;
+      }
+      .tile:nth-child(23) {
+        animation-delay: 1.2s;
+      }
+      .tile:nth-child(24) {
+        animation-delay: 1.25s;
+      }
+      .tile:nth-child(25) {
+        animation-delay: 1.3s;
       }
     </style>
   </head>
@@ -78,17 +557,45 @@
     <h1>Pom Pom</h1>
     <button
       id="leaderboard-btn"
-      onclick="window.location.href='dashboard.html'"
+      onclick="window.location.href='leaderboard.html'"
     >
-      LeaderBoards
+      Leader Board🏆
     </button>
 
     <div id="prompt">🟩 Left Palm = Green, 🟥 Right Palm = Red</div>
-    <div id="grid"></div>
-    <div id="timer">⏱️ 25</div>
-    <div id="score">Score: 0</div>
-    <div id="game-over"></div>
-    <button id="retry" onclick="location.reload()">Retry</button>
+
+    <div class="stats-container">
+      <div class="stat-card">
+        <div class="stat-label">⏱️ Time</div>
+        <div class="stat-value" id="timer">25</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-label">🎯 Score</div>
+        <div class="stat-value" id="score">0</div>
+      </div>
+    </div>
+
+    <div class="grid-container">
+      <div id="grid"></div>
+    </div>
+
+    <div
+      class="game-end-container"
+      style="display: none"
+      id="game-end-container"
+    >
+      <div id="game-over"></div>
+      <button id="retry" onclick="location.reload()">Play Again</button>
+    </div>
+    <script>
+      document.addEventListener("keydown", (e) => {
+        if (e.code === "Space") {
+          e.preventDefault(); // Prevent page scroll or other default behavior
+          const retryBtn = document.getElementById("retry");
+          if (retryBtn) retryBtn.click();
+        }
+      });
+    </script>
 
     <video
       id="video"
@@ -120,6 +627,55 @@
           window.location.href = "index.html";
         }
       });
+
+      // Enhanced animations for score updates
+      let lastScore = 0;
+
+      function addScoreAnimation() {
+        const scoreElement = document.getElementById("score");
+        if (scoreElement) {
+          const newScore = parseInt(
+            scoreElement.textContent.replace("Score: ", "") || "0"
+          );
+          if (newScore > lastScore) {
+            scoreElement.parentElement.classList.add("score-animation");
+            setTimeout(() => {
+              scoreElement.parentElement.classList.remove("score-animation");
+            }, 300);
+          }
+          lastScore = newScore;
+        }
+      }
+
+      // Timer warning animation
+      function addTimerWarning() {
+        const timerElement = document.getElementById("timer");
+        if (timerElement) {
+          const timeLeft = parseInt(timerElement.textContent || "25");
+          if (timeLeft <= 5 && timeLeft > 0) {
+            timerElement.classList.add("timer-warning");
+          } else {
+            timerElement.classList.remove("timer-warning");
+          }
+        }
+      }
+
+      // Monitor score and timer changes
+      setInterval(() => {
+        addScoreAnimation();
+        addTimerWarning();
+
+        // Show game end container when game over message appears
+        const gameOverElement = document.getElementById("game-over");
+        const gameEndContainer = document.getElementById("game-end-container");
+        if (
+          gameOverElement &&
+          gameEndContainer &&
+          gameOverElement.textContent.trim()
+        ) {
+          gameEndContainer.style.display = "block";
+        }
+      }, 100);
     </script>
   </body>
 </html>

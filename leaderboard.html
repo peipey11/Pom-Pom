@@ -1,40 +1,450 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <meta charset="UTF-8" />
     <title>Leaderboard</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap"
+      rel="stylesheet"
+    />
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
     <style>
-      body {
-        font-family: sans-serif;
-        text-align: center;
-        background-color: #f2f2f2;
-      }
-      h1 {
-        margin-top: 20px;
-      }
-      ul {
-        list-style-type: none;
+      * {
+        box-sizing: border-box;
+        margin: 0;
         padding: 0;
-        max-width: 400px;
-        margin: 0 auto;
       }
-      li {
-        background: white;
-        padding: 12px;
-        margin: 6px 0;
-        border-radius: 6px;
-        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+
+      body {
+        font-family: "Inter", sans-serif;
+        background: linear-gradient(
+          135deg,
+          #1a1a2e 0%,
+          #16213e 50%,
+          #0f3460 100%
+        );
+        color: white;
+        min-height: 100vh;
+        overflow-x: hidden;
+        position: relative;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+      }
+
+      /* Animated background particles */
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: radial-gradient(
+            circle at 20% 80%,
+            rgba(120, 119, 198, 0.3) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(255, 255, 255, 0.1) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 40% 40%,
+            rgba(120, 119, 198, 0.2) 0%,
+            transparent 50%
+          );
+        animation: float 20s ease-in-out infinite;
+        pointer-events: none;
+        z-index: -1;
+      }
+
+      @keyframes float {
+        0%,
+        100% {
+          transform: translateY(0px) rotate(0deg);
+        }
+        33% {
+          transform: translateY(-20px) rotate(0.5deg);
+        }
+        66% {
+          transform: translateY(10px) rotate(-0.5deg);
+        }
+      }
+
+      .container {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 500px;
+        animation: fadeIn 0.8s ease-out;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      h1 {
+        font-size: clamp(2.5rem, 5vw, 4rem);
+        font-weight: 700;
+        text-align: center;
+        margin-bottom: 3rem;
+        background: linear-gradient(45deg, #fff, #a8edea, #fed6e3);
+        background-size: 400% 400%;
+        -webkit-background-clip: text;
+        background-clip: text;
+        -webkit-text-fill-color: transparent;
+        animation: gradientShift 3s ease-in-out infinite,
+          slideInDown 0.8s ease-out;
+        text-shadow: 0 4px 20px rgba(255, 255, 255, 0.3);
+      }
+
+      @keyframes gradientShift {
+        0%,
+        100% {
+          background-position: 0% 50%;
+        }
+        50% {
+          background-position: 100% 50%;
+        }
+      }
+
+      @keyframes slideInDown {
+        from {
+          opacity: 0;
+          transform: translateY(-50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .leaderboard-container {
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(20px);
+        border: 2px solid rgba(255, 255, 255, 0.2);
+        border-radius: 20px;
+        padding: 40px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.1);
+        position: relative;
+        overflow: hidden;
+        animation: slideInUp 0.8s ease-out 0.2s both;
+      }
+
+      @keyframes slideInUp {
+        from {
+          opacity: 0;
+          transform: translateY(50px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .leaderboard-container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        animation: shimmer 3s infinite;
+      }
+
+      @keyframes shimmer {
+        0% {
+          left: -100%;
+        }
+        100% {
+          left: 100%;
+        }
+      }
+
+      .leaderboard-table {
+        width: 100%;
+        border-collapse: collapse;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 15px;
+        overflow: hidden;
+        font-size: 1rem;
+        position: relative;
+        z-index: 1;
+      }
+
+      .leaderboard-table th {
+        background: rgba(255, 255, 255, 0.1);
+        padding: 20px 16px;
+        text-align: center;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        font-size: 0.9rem;
+        color: #a8edea;
+        border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+      }
+
+      .leaderboard-table td {
+        padding: 16px;
+        text-align: center;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        color: rgba(255, 255, 255, 0.9);
+        font-size: 1rem;
+        font-weight: 500;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      }
+
+      .leaderboard-table tr:last-child td {
+        border-bottom: none;
+      }
+
+      .leaderboard-table tbody tr {
+        animation: slideInItem 0.6s ease-out forwards;
+        opacity: 0;
+        transform: translateX(-20px);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .leaderboard-table tbody tr:nth-child(1) {
+        animation-delay: 0.1s;
+      }
+      .leaderboard-table tbody tr:nth-child(2) {
+        animation-delay: 0.2s;
+      }
+      .leaderboard-table tbody tr:nth-child(3) {
+        animation-delay: 0.3s;
+      }
+      .leaderboard-table tbody tr:nth-child(4) {
+        animation-delay: 0.4s;
+      }
+      .leaderboard-table tbody tr:nth-child(5) {
+        animation-delay: 0.5s;
+      }
+      .leaderboard-table tbody tr:nth-child(6) {
+        animation-delay: 0.6s;
+      }
+      .leaderboard-table tbody tr:nth-child(7) {
+        animation-delay: 0.7s;
+      }
+      .leaderboard-table tbody tr:nth-child(8) {
+        animation-delay: 0.8s;
+      }
+      .leaderboard-table tbody tr:nth-child(9) {
+        animation-delay: 0.9s;
+      }
+      .leaderboard-table tbody tr:nth-child(10) {
+        animation-delay: 1s;
+      }
+
+      @keyframes slideInItem {
+        to {
+          opacity: 1;
+          transform: translateX(0);
+        }
+      }
+
+      .leaderboard-table tbody tr:hover {
+        background: rgba(255, 255, 255, 0.1);
+        transform: scale(1.02);
+        box-shadow: 0 8px 25px rgba(120, 119, 198, 0.2);
+      }
+
+      /* Medal styling for top 3 */
+      .leaderboard-table tbody tr:nth-child(1) {
+        background: linear-gradient(
+          135deg,
+          rgba(255, 215, 0, 0.2),
+          rgba(255, 193, 7, 0.1)
+        );
+      }
+
+      .leaderboard-table tbody tr:nth-child(2) {
+        background: linear-gradient(
+          135deg,
+          rgba(192, 192, 192, 0.2),
+          rgba(169, 169, 169, 0.1)
+        );
+      }
+
+      .leaderboard-table tbody tr:nth-child(3) {
+        background: linear-gradient(
+          135deg,
+          rgba(205, 127, 50, 0.2),
+          rgba(184, 115, 51, 0.1)
+        );
+      }
+
+      .rank-cell {
+        font-size: 1.5rem;
+        font-weight: 700;
+      }
+
+      .player-name {
+        font-weight: 600;
+        color: rgba(255, 255, 255, 0.95);
+      }
+
+      .player-score {
+        font-weight: 700;
+        font-size: 1.1rem;
+        color: #51cf66;
+        text-shadow: 0 0 10px rgba(81, 207, 102, 0.5);
+      }
+
+      .loading {
+        text-align: center;
+        font-size: 1.2rem;
+        color: rgba(255, 255, 255, 0.7);
+        animation: pulse 2s infinite;
+        padding: 40px;
+      }
+
+      @keyframes pulse {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+
+      .back-button {
+        position: absolute;
+        top: 20px;
+        left: 20px;
+        padding: 12px 24px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(10px);
+        color: white;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 50px;
+        cursor: pointer;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        z-index: 10;
+      }
+
+      .back-button:hover {
+        transform: translateY(-2px);
+        background: rgba(255, 255, 255, 0.2);
+        box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1);
+      }
+
+      /* Responsive Design */
+      @media (max-width: 768px) {
+        body {
+          padding: 15px;
+        }
+
+        h1 {
+          font-size: 2.5rem;
+          margin-bottom: 2rem;
+        }
+
+        .leaderboard-container {
+          padding: 25px;
+        }
+
+        .leaderboard-table th {
+          padding: 15px 12px;
+          font-size: 0.8rem;
+        }
+
+        .leaderboard-table td {
+          padding: 12px 8px;
+          font-size: 0.9rem;
+        }
+
+        .rank-cell {
+          font-size: 1.2rem;
+        }
+
+        .player-score {
+          font-size: 1rem;
+        }
+
+        .back-button {
+          top: 15px;
+          left: 15px;
+          padding: 10px 20px;
+          font-size: 0.8rem;
+        }
+      }
+
+      @media (max-width: 480px) {
+        h1 {
+          font-size: 2rem;
+          margin-bottom: 1.5rem;
+        }
+
+        .leaderboard-container {
+          padding: 20px;
+        }
+
+        .leaderboard-table th {
+          padding: 12px 8px;
+          font-size: 0.75rem;
+        }
+
+        .leaderboard-table td {
+          padding: 10px 6px;
+          font-size: 0.85rem;
+        }
+
+        .rank-cell {
+          font-size: 1.1rem;
+        }
       }
     </style>
   </head>
   <body>
-    <h1>🏆 Leaderboard</h1>
-    <ul id="leaderboard">
-      <li>Loading...</li>
-    </ul>
+    <a href="game.html" class="back-button"> ← Back to Game </a>
+
+    <div class="container">
+      <h1>🏆</h1>
+      <h1>Leader board</h1>
+      <div class="leaderboard-container">
+        <table class="leaderboard-table">
+          <thead>
+            <tr>
+              <th>Player</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody id="leaderboard">
+            <tr>
+              <td colspan="2" class="loading">Loading...</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
 
     <script>
       const firebaseConfig = {
@@ -47,23 +457,18 @@
         measurementId: "G-W9340KZW2B",
       };
 
-      // Initialize Firebase
       firebase.initializeApp(firebaseConfig);
       const db = firebase.firestore();
       const auth = firebase.auth();
 
-      // 🔒 Check if user is logged in
       auth.onAuthStateChanged((user) => {
         if (!user) {
-          // Not logged in → redirect to login
           window.location.href = "index.html";
         } else {
-          // Logged in → load leaderboard
           loadLeaderboard();
         }
       });
 
-      // 🏆 Load leaderboard from Firestore
       async function loadLeaderboard() {
         try {
           const usersRef = db.collection("users");
@@ -75,16 +480,29 @@
           const leaderboard = document.getElementById("leaderboard");
           leaderboard.innerHTML = "";
 
-          snapshot.forEach((doc) => {
+          if (snapshot.empty) {
+            const row = document.createElement("tr");
+            row.innerHTML =
+              '<td colspan="2" class="loading">No scores yet!</td>';
+            leaderboard.appendChild(row);
+            return;
+          }
+
+          snapshot.forEach((doc, index) => {
             const data = doc.data();
-            const item = document.createElement("li");
-            item.textContent = `${data.username || "Unknown"} - ${
-              data.highscore || 0
-            }`;
-            leaderboard.appendChild(item);
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td class="player-name">${data.username || "Unknown"}</td>
+              <td class="player-score">${data.highscore || 0}</td>
+            `;
+
+            leaderboard.appendChild(row);
           });
         } catch (error) {
           console.error("Error loading leaderboard:", error);
+          const leaderboard = document.getElementById("leaderboard");
+          leaderboard.innerHTML =
+            '<tr><td colspan="2" class="loading">Error loading leaderboard</td></tr>';
         }
       }
     </script>

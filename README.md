@@ -4,7 +4,7 @@
 
 ## Basic Details
 
-### Team Name: [Name]
+### Team Name: Liar's
 
 ### Team Members
 
