@@ -1,28 +1,27 @@
 <img width="3188" height="1202" alt="frame (3)" src="https://github.com/user-attachments/assets/517ad8e9-ad22-457d-9538-a9e62d137cd7" />
 
-# [Project Name] 🎯
+# [Pom Pom] 🎯
 
 ## Basic Details
 
-### Team Name: Liar's
+### Team Name: [Liars]
 
 ### Team Members
 
-- Team Lead: [Name] - [College]
-- Member 2: [Name] - [College]
-- Member 3: [Name] - [College]
+- Team Lead: [Vishnu P P] - [AISAT]
+- Member 2: [Joel Prince] - [AISAT]
 
 ### Project Description
 
-[2-3 lines about what your project does]
+[Pom Pom is a gesture-controlled game where players use hand movements detected via webcam.]
 
 ### The Problem (that doesn't exist)
 
-[What ridiculous problem are you solving?]
+[Urgent need to Pom Pom everyday]
 
 ### The Solution (that nobody asked for)
 
-[How are you solving it? Keep it fun!]
+[Turn your hands into pom-pom cannons. No buttons. Just vibes]
 
 ## Technical Details
 
@@ -30,16 +29,10 @@
 
 For Software:
 
-- [Languages used]
-- [Frameworks used]
-- [Libraries used]
-- [Tools used]
-
-For Hardware:
-
-- [List main components]
-- [List specifications]
-- [List tools required]
+    Frontend:HTML, CSS, JS
+    Backend :Firebase Services, Firebase Auth, Firestore(db)
+    Libraries:Firebase SDK, MediaPipe Hands, Google Fonts
+    Hosting: Vercel
 
 ### Implementation
 
@@ -47,7 +40,7 @@ For Software:
 
 # Installation
 
-[commands]
+Access the website at https://pom-pom-pom.vercel.app/
 
 # Run
 
@@ -107,8 +100,8 @@ _Explain what the video demonstrates_
 
 ## Team Contributions
 
-- [Name 1]: Vishnu PP
-- [Name 2]: Joel Prince
+- [Vishnu P P]: [Gameplay and backend]
+- [Joel prince]: [Frontend]
 
 ---
 
