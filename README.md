@@ -52,14 +52,14 @@ For Software:
 
 # Screenshots (Add at least 3)
 
-![Screenshot1](Add screenshot 1 here with proper name)
-_Add caption explaining what this shows_
+![Home](screenshots/home.jpg)
+Initial Home screen where players learn how the game controls work.
 
-![Screenshot2](Add screenshot 2 here with proper name)
-_Add caption explaining what this shows_
+![Game](screenshots/game.jpg)
+Game screen where the fun stuff happens.
 
-![Screenshot3](Add screenshot 3 here with proper name)
-_Add caption explaining what this shows_
+![Leaderboard](screenshots/leaderboard.jpg)
+Leaderboard to find who the POM POM god is.
 
 # Diagrams
 
