@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Rotating Images</title>
+    <style>
+      body {
+        margin: 0;
+        padding: 0;
+        height: 100vh;
+        background: #0f172a;
+        position: relative;
+        overflow: hidden;
+      }
+
+      @keyframes rotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .rotating-image {
+        width: 100px;
+        height: auto;
+        position: absolute;
+        animation: rotate 4s linear infinite;
+      }
+
+      .bottom-left {
+        bottom: 20px;
+        left: 20px;
+      }
+
+      .bottom-right {
+        bottom: 20px;
+        right: 20px;
+      }
+    </style>
+  </head>
+  <body>
+    <img src="ring.png" class="rotating-image bottom-left" alt="Left Gear" />
+    <img src="ring.png" class="rotating-image bottom-right" alt="Right Gear" />
+  </body>
+</html>
