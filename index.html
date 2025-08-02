@@ -31,6 +31,22 @@
         margin: 20px auto;
         background-color: gray;
       }
+
+      .play-button {
+        margin: 20px auto 0;
+        padding: 12px 24px;
+        font-size: 18px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        cursor: pointer;
+        display: block;
+      }
+
+      .play-button:hover {
+        background-color: #218838;
+      }
     </style>
   </head>
   <body>
@@ -39,6 +55,18 @@
     <div class="status-indicator" id="indicator"></div>
 
     <video id="camera" autoplay muted playsinline></video>
+
+    <button class="play-button" onclick="window.location.href='game.html'">
+      Play Game
+    </button>
+    <video
+      id="video"
+      autoplay
+      playsinline
+      width="0"
+      height="0"
+      style="display: none"
+    ></video>
 
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js"></script>
